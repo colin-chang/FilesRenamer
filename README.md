@@ -5,7 +5,7 @@
 工具可以批量递归修改给定目录下文件名，按照特定规则替换文件名内容，如**去除文件名前缀或者后缀**
 
 ## 技术
-工具基于.Net Core 2.2开发
+工具基于.Net Core 2.2开发。系统需要安装.Net Core Runtime才可以运行该程序
 
 ## 使用
 1. [下载](https://github.com/colin-chang/renamer/releases/download/1.0/rename-release.zip)软件并解压
@@ -14,3 +14,5 @@
     ```sh
     dotnet Renamer.dll
     ```
+
+> 系统需要安装
