@@ -1,30 +1,41 @@
 ﻿using System;
 using System.IO;
 
-namespace ColinChang.OpenSource.Renamer
+namespace ColinChang.Renamer
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var dir = string.Empty;
-            while (!Directory.Exists(dir))
+            if (args.Length < 2)
             {
-                var msg = string.IsNullOrWhiteSpace(dir)
-                    ? "Please enter the root directory:"
-                    : "root directory doesn't exist,try to enter a new one:";
-                Console.WriteLine(msg);
-                dir = Console.ReadLine();
+                Console.WriteLine("Error.invalid arguments...");
+                return;
             }
 
-            var files = Directory.GetFiles(dir, String.Empty, searchOption: SearchOption.AllDirectories);
-            if (files.Length <= 0)
-                Console.WriteLine("Done. there is no file.");
+            var dir = args[0];
+            if (!Directory.Exists(dir))
+            {
+                Console.WriteLine($"Error.{args[0]} does not exist...");
+                return;
+            }
 
-            Console.WriteLine("Replace from ?");
-            var from = Console.ReadLine();
-            Console.WriteLine("Replace to ?");
-            var to = Console.ReadLine();
+            var opt = string.Equals(args[1], "-y") ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            var files = Directory.GetFiles(dir, string.Empty, searchOption: opt);
+            if (files.Length <= 0)
+            {
+                Console.WriteLine($"Done.there are no files under {args[0]}.");
+                return;
+            }
+
+            var from = args.Length < 3 ? string.Empty : args[2];
+            if (string.IsNullOrWhiteSpace(from))
+            {
+                Console.WriteLine("Done.replace pattern is empty...");
+                return;
+            }
+
+            var to = args.Length < 4 ? string.Empty : args[3];
 
             var cnt = 0;
             try
@@ -32,13 +43,15 @@ namespace ColinChang.OpenSource.Renamer
                 foreach (var file in files)
                 {
                     //skip hidden file on linux/mac
-                    if (file.StartsWith("."))
+                    if (Path.GetFileName(file).StartsWith("."))
                         continue;
 
                     var newName = Path.Combine(Path.GetDirectoryName(file),
                         Path.GetFileName(file).Replace(from, to));
+                    if (string.Equals(file, newName))
+                        continue;
+
                     new FileInfo(file).MoveTo(newName);
-                    
                     Console.WriteLine($"Rename {file} to {newName}");
                     cnt++;
                 }
